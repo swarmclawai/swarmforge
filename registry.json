@@ -86,5 +86,27 @@
     "tags": ["tasks", "automation", "productivity"],
     "openclaw": false,
     "downloads": 0
+  },
+  {
+    "id": "cost-tracker",
+    "name": "Cost Tracker",
+    "description": "Tracks token usage and estimated costs per agent chat. Provides a tool to check current session spend.",
+    "author": "openclaw",
+    "version": "1.0.0",
+    "url": "https://raw.githubusercontent.com/swarmclawai/swarmforge/main/cost-tracker.js",
+    "tags": ["cost", "tokens", "monitoring"],
+    "openclaw": true,
+    "downloads": 0
+  },
+  {
+    "id": "context-window",
+    "name": "Context Window",
+    "description": "Monitors conversation context size and warns agents when approaching model limits. Helps prevent context overflow.",
+    "author": "openclaw",
+    "version": "1.0.0",
+    "url": "https://raw.githubusercontent.com/swarmclawai/swarmforge/main/context-window.js",
+    "tags": ["context", "monitoring", "limits"],
+    "openclaw": true,
+    "downloads": 0
   }
 ]
