@@ -1,0 +1,90 @@
+[
+  {
+    "id": "tool-logger",
+    "name": "Tool Logger",
+    "description": "Logs all tool executions with timestamps, inputs, and outputs to a local audit file for debugging and compliance.",
+    "author": "swarmclaw",
+    "version": "1.0.0",
+    "url": "https://raw.githubusercontent.com/swarmclawai/swarmforge/main/tool-logger.js",
+    "tags": ["logging", "debugging", "audit"],
+    "openclaw": false,
+    "downloads": 0
+  },
+  {
+    "id": "shell-gate",
+    "name": "Shell Gate",
+    "description": "Blocks dangerous shell commands like rm -rf /, chmod 777, and dd before they reach the terminal. Configurable blocklist.",
+    "author": "swarmclaw",
+    "version": "1.0.0",
+    "url": "https://raw.githubusercontent.com/swarmclawai/swarmforge/main/shell-gate.js",
+    "tags": ["security", "shell", "safety"],
+    "openclaw": false,
+    "downloads": 0
+  },
+  {
+    "id": "token-limiter",
+    "name": "Token Limiter",
+    "description": "Limits the maximum tokens per agent response to prevent runaway costs. Configurable per-model thresholds.",
+    "author": "swarmclaw",
+    "version": "1.0.0",
+    "url": "https://raw.githubusercontent.com/swarmclawai/swarmforge/main/token-limiter.js",
+    "tags": ["cost", "limits", "tokens"],
+    "openclaw": false,
+    "downloads": 0
+  },
+  {
+    "id": "memory-auto-save",
+    "name": "Memory Auto-Save",
+    "description": "Automatically detects and saves important facts, decisions, and context from agent responses to the memory store.",
+    "author": "swarmclaw",
+    "version": "1.0.0",
+    "url": "https://raw.githubusercontent.com/swarmclawai/swarmforge/main/memory-auto-save.js",
+    "tags": ["memory", "automation", "context"],
+    "openclaw": false,
+    "downloads": 0
+  },
+  {
+    "id": "webhook-notifier",
+    "name": "Webhook Notifier",
+    "description": "Sends HTTP webhooks on agent events like task completion, errors, and tool executions. Supports Slack, Discord, and custom endpoints.",
+    "author": "swarmclaw",
+    "version": "1.0.0",
+    "url": "https://raw.githubusercontent.com/swarmclawai/swarmforge/main/webhook-notifier.js",
+    "tags": ["notifications", "webhooks", "integrations"],
+    "openclaw": false,
+    "downloads": 0
+  },
+  {
+    "id": "response-filter",
+    "name": "Response Filter",
+    "description": "Scans agent responses for sensitive data like API keys, passwords, and PII, then redacts them before display.",
+    "author": "swarmclaw",
+    "version": "1.0.0",
+    "url": "https://raw.githubusercontent.com/swarmclawai/swarmforge/main/response-filter.js",
+    "tags": ["security", "privacy", "filtering"],
+    "openclaw": false,
+    "downloads": 0
+  },
+  {
+    "id": "openclaw-bridge",
+    "name": "OpenClaw Bridge",
+    "description": "Bridges OpenClaw lifecycle events to SwarmClaw hooks, enabling OpenClaw-format plugins to run natively in SwarmClaw.",
+    "author": "openclaw",
+    "version": "1.0.0",
+    "url": "https://raw.githubusercontent.com/swarmclawai/swarmforge/main/openclaw-bridge.js",
+    "tags": ["openclaw", "bridge", "compatibility"],
+    "openclaw": true,
+    "downloads": 0
+  },
+  {
+    "id": "task-auto-create",
+    "name": "Task Auto-Create",
+    "description": "Parses agent responses for actionable items and automatically creates tasks on the task board with appropriate status.",
+    "author": "swarmclaw",
+    "version": "1.0.0",
+    "url": "https://raw.githubusercontent.com/swarmclawai/swarmforge/main/task-auto-create.js",
+    "tags": ["tasks", "automation", "productivity"],
+    "openclaw": false,
+    "downloads": 0
+  }
+]
