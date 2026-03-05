@@ -43,6 +43,7 @@ module.exports = {
   name: 'Token Limiter',
   description: 'Limits the maximum tokens per agent response to prevent runaway costs. Configurable per-model thresholds.',
   version: '1.0.0',
+  openclaw: true,
 
   hooks: {
     transformOutboundMessage(ctx) {
@@ -76,8 +77,8 @@ module.exports = {
   ],
 
   // --- OpenClaw Format ---
-  activate(ctx) {
-    ctx.onMessage((msgCtx) => {
+  register(api) {
+    api.registerHook('message:outbound', (msgCtx) => {
       if (msgCtx.message?.role !== 'assistant') return;
       const model = msgCtx.session?.model;
       const limit = getLimit(model);
@@ -85,7 +86,6 @@ module.exports = {
         msgCtx.message.content = truncateToLimit(msgCtx.message.content, limit);
       }
     });
-    ctx.log.info('Token Limiter activated');
+    api.log.info('Token Limiter activated');
   },
-  deactivate() {},
 };

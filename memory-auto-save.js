@@ -66,6 +66,7 @@ module.exports = {
   name: 'Memory Auto-Save',
   description: 'Automatically detects and saves important facts, decisions, and context from agent responses to the memory store.',
   version: '1.0.0',
+  openclaw: true,
 
   hooks: {
     async afterAgentComplete(ctx) {
@@ -99,15 +100,15 @@ module.exports = {
   ],
 
   // --- OpenClaw Format ---
-  activate(ctx) {
-    ctx.onAgentComplete(async (agentCtx) => {
+  register(api) {
+    api.registerHook('agent:complete', async (agentCtx) => {
       const facts = extractImportantFacts(agentCtx.response);
       if (facts.length > 0) {
-        ctx.log.info(`Auto-saving ${facts.length} facts`);
+        api.log.info(`Auto-saving ${facts.length} facts`);
         await saveToMemory(facts, agentCtx.session);
       }
     });
-    ctx.registerTool({
+    api.registerTool({
       name: 'memory_auto_save_test',
       description: 'Test fact extraction on text.',
       parameters: { type: 'object', properties: { text: { type: 'string' } }, required: ['text'] },
@@ -115,7 +116,6 @@ module.exports = {
         return JSON.stringify({ factsFound: extractImportantFacts(args.text).length, facts: extractImportantFacts(args.text) }, null, 2);
       },
     });
-    ctx.log.info('Memory Auto-Save activated');
+    api.log.info('Memory Auto-Save activated');
   },
-  deactivate() {},
 };

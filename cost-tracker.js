@@ -75,8 +75,8 @@ module.exports = {
   ],
 
   // --- OpenClaw Format ---
-  activate(ctx) {
-    ctx.onAgentComplete((agentCtx) => {
+  register(api) {
+    api.registerHook('agent:complete', (agentCtx) => {
       const sessionId = agentCtx.session?.id || 'unknown';
       const model = agentCtx.session?.model || 'unknown';
       const responseLen = (agentCtx.response || '').length;
@@ -87,7 +87,7 @@ module.exports = {
       tracker.outputTokens += tokens;
       tracker.totalCost += estimateCost(model, tokens, tokens);
     });
-    ctx.registerTool({
+    api.registerTool({
       name: 'check_session_cost',
       description: 'Check estimated token usage and cost for the current session.',
       parameters: { type: 'object', properties: {} },
@@ -98,7 +98,6 @@ module.exports = {
         return JSON.stringify({ activeSessions: entries.length, sessions: entries.slice(-5) }, null, 2);
       },
     });
-    ctx.log.info('Cost Tracker activated');
+    api.log.info('Cost Tracker activated');
   },
-  deactivate() { sessionCosts.clear(); },
 };

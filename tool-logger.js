@@ -39,6 +39,7 @@ module.exports = {
   name: 'Tool Logger',
   description: 'Logs all tool executions with timestamps, inputs, and outputs to a local audit file for debugging and compliance.',
   version: '1.0.0',
+  openclaw: true,
 
   hooks: {
     beforeToolExec(ctx) {
@@ -78,11 +79,11 @@ module.exports = {
   ],
 
   // --- OpenClaw Format ---
-  activate(ctx) {
-    ctx.onToolCall((toolCtx) => {
+  register(api) {
+    api.registerHook('tool:call', (toolCtx) => {
       toolCtx._toolLogStart = Date.now();
     });
-    ctx.onToolResult((toolCtx) => {
+    api.registerHook('tool:result', (toolCtx) => {
       const duration = toolCtx._toolLogStart ? Date.now() - toolCtx._toolLogStart : null;
       logEntry({
         ts: new Date().toISOString(),
@@ -92,7 +93,7 @@ module.exports = {
         durationMs: duration,
       });
     });
-    ctx.registerTool({
+    api.registerTool({
       name: 'view_tool_logs',
       description: 'View recent tool execution logs from today.',
       parameters: { type: 'object', properties: { limit: { type: 'number' } } },
@@ -104,7 +105,6 @@ module.exports = {
         return JSON.stringify(lines.slice(-limit).map(l => { try { return JSON.parse(l); } catch { return l; } }), null, 2);
       },
     });
-    ctx.log.info('Tool Logger activated');
+    api.log.info('Tool Logger activated');
   },
-  deactivate() {},
 };

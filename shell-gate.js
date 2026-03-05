@@ -48,6 +48,7 @@ module.exports = {
   name: 'Shell Gate',
   description: 'Blocks dangerous shell commands like rm -rf /, chmod 777, and dd before they reach the terminal. Configurable blocklist.',
   version: '1.0.0',
+  openclaw: true,
 
   hooks: {
     beforeToolExec(ctx) {
@@ -77,8 +78,8 @@ module.exports = {
   ],
 
   // --- OpenClaw Format ---
-  activate(ctx) {
-    ctx.onToolCall((toolCtx) => {
+  register(api) {
+    api.registerHook('tool:call', (toolCtx) => {
       if (toolCtx.toolName !== 'execute_command' && toolCtx.toolName !== 'shell') return;
       const cmd = toolCtx.input?.command || toolCtx.input?.cmd || '';
       const blocked = checkCommand(cmd);
@@ -86,7 +87,6 @@ module.exports = {
         return { blocked: true, error: blocked };
       }
     });
-    ctx.log.info('Shell Gate activated — dangerous commands will be blocked');
+    api.log.info('Shell Gate activated — dangerous commands will be blocked');
   },
-  deactivate() {},
 };

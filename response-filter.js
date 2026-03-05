@@ -39,6 +39,7 @@ module.exports = {
   name: 'Response Filter',
   description: 'Scans agent responses for sensitive data like API keys, passwords, and PII, then redacts them before display.',
   version: '1.0.0',
+  openclaw: true,
 
   hooks: {
     transformOutboundMessage(ctx) {
@@ -73,18 +74,17 @@ module.exports = {
   ],
 
   // --- OpenClaw Format ---
-  activate(ctx) {
-    ctx.onMessage((msgCtx) => {
+  register(api) {
+    api.registerHook('message:outbound', (msgCtx) => {
       if (msgCtx.message?.role !== 'assistant') return;
       if (msgCtx.message.content && typeof msgCtx.message.content === 'string') {
         const { text, redactions } = redactText(msgCtx.message.content);
         if (redactions > 0) {
-          ctx.log.info(`Redacted ${redactions} sensitive item(s)`);
+          api.log.info(`Redacted ${redactions} sensitive item(s)`);
           msgCtx.message.content = text;
         }
       }
     });
-    ctx.log.info('Response Filter activated');
+    api.log.info('Response Filter activated');
   },
-  deactivate() {},
 };

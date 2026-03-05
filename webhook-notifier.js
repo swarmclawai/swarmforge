@@ -55,6 +55,7 @@ module.exports = {
   name: 'Webhook Notifier',
   description: 'Sends HTTP webhooks on agent events like task completion, errors, and tool executions. Supports Slack, Discord, and custom endpoints.',
   version: '1.0.0',
+  openclaw: true,
 
   hooks: {
     async afterAgentComplete(ctx) {
@@ -120,14 +121,13 @@ module.exports = {
   ],
 
   // --- OpenClaw Format ---
-  activate(ctx) {
-    ctx.onAgentComplete(async (agentCtx) => {
+  register(api) {
+    api.registerHook('agent:complete', async (agentCtx) => {
       await notifyAll('agent.complete', { sessionId: agentCtx.session?.id });
     });
-    ctx.onToolResult(async (toolCtx) => {
+    api.registerHook('tool:result', async (toolCtx) => {
       await notifyAll('tool.complete', { tool: toolCtx.toolName });
     });
-    ctx.log.info('Webhook Notifier activated');
+    api.log.info('Webhook Notifier activated');
   },
-  deactivate() {},
 };

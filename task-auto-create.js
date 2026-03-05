@@ -60,6 +60,7 @@ module.exports = {
   name: 'Task Auto-Create',
   description: 'Parses agent responses for actionable items and automatically creates tasks on the task board with appropriate status.',
   version: '1.0.0',
+  openclaw: true,
 
   hooks: {
     async afterAgentComplete(ctx) {
@@ -93,17 +94,17 @@ module.exports = {
   ],
 
   // --- OpenClaw Format ---
-  activate(ctx) {
-    ctx.onAgentComplete(async (agentCtx) => {
+  register(api) {
+    api.registerHook('agent:complete', async (agentCtx) => {
       const tasks = extractTasks(agentCtx.response);
       if (tasks.length > 0) {
-        ctx.log.info(`Auto-creating ${tasks.length} task(s)`);
+        api.log.info(`Auto-creating ${tasks.length} task(s)`);
         for (const title of tasks) {
           await createTask(title, agentCtx.session);
         }
       }
     });
-    ctx.registerTool({
+    api.registerTool({
       name: 'task_auto_create_test',
       description: 'Test task extraction on text.',
       parameters: { type: 'object', properties: { text: { type: 'string' } }, required: ['text'] },
@@ -111,7 +112,6 @@ module.exports = {
         return JSON.stringify({ tasksFound: extractTasks(args.text).length, tasks: extractTasks(args.text) }, null, 2);
       },
     });
-    ctx.log.info('Task Auto-Create activated');
+    api.log.info('Task Auto-Create activated');
   },
-  deactivate() {},
 };

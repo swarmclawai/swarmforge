@@ -20,7 +20,7 @@ function discoverOpenClawPlugins() {
         delete require.cache[fullPath];
         const mod = require(fullPath);
         const raw = mod.default || mod;
-        if (raw.name && typeof raw.activate === 'function') {
+        if (raw.name && (typeof raw.register === 'function' || typeof raw.activate === 'function')) {
           plugins.push({ file, plugin: raw });
         }
       } catch { /* skip invalid */ }
@@ -43,19 +43,29 @@ module.exports = {
       for (const { plugin } of ocPlugins) {
         try {
           if (!plugin._activated) {
-            plugin.activate({
-              onAgentStart: () => {},
-              onAgentComplete: () => {},
-              onToolCall: () => {},
-              onToolResult: () => {},
-              onMessage: () => {},
+            const bridgeApi = {
+              registerHook: () => {},
               registerTool: () => {},
               log: {
                 info: (msg) => console.log(`[openclaw:${plugin.name}]`, msg),
                 warn: (msg) => console.warn(`[openclaw:${plugin.name}]`, msg),
                 error: (msg) => console.error(`[openclaw:${plugin.name}]`, msg),
               },
-            });
+            };
+            if (typeof plugin.register === 'function') {
+              plugin.register(bridgeApi);
+            } else if (typeof plugin.activate === 'function') {
+              // Legacy fallback for old-format plugins
+              plugin.activate({
+                onAgentStart: () => {},
+                onAgentComplete: () => {},
+                onToolCall: () => {},
+                onToolResult: () => {},
+                onMessage: () => {},
+                registerTool: () => {},
+                log: bridgeApi.log,
+              });
+            }
             plugin._activated = true;
           }
         } catch { /* skip failed activation */ }
@@ -75,7 +85,7 @@ module.exports = {
             status: 'active',
             pluginsDir: OPENCLAW_PLUGINS_DIR,
             discovered: 0,
-            message: 'No OpenClaw plugins found. Place .js files with activate() in data/openclaw/',
+            message: 'No OpenClaw plugins found. Place .js files with register(api) in data/openclaw/',
           }, null, 2);
         }
         return JSON.stringify({
@@ -93,25 +103,29 @@ module.exports = {
   ],
 
   // --- OpenClaw Format ---
-  activate(ctx) {
-    ctx.log.info('OpenClaw Bridge activated — scanning data/openclaw/ for plugins');
+  register(api) {
+    api.log.info('OpenClaw Bridge activated — scanning data/openclaw/ for plugins');
     const ocPlugins = discoverOpenClawPlugins();
     for (const { file, plugin } of ocPlugins) {
       try {
-        plugin.activate({
-          onAgentStart: ctx.onAgentStart || (() => {}),
-          onAgentComplete: ctx.onAgentComplete || (() => {}),
-          onToolCall: ctx.onToolCall || (() => {}),
-          onToolResult: ctx.onToolResult || (() => {}),
-          onMessage: ctx.onMessage || (() => {}),
-          registerTool: ctx.registerTool || (() => {}),
-          log: ctx.log,
-        });
-        ctx.log.info(`Bridged OpenClaw plugin: ${plugin.name} (${file})`);
+        if (typeof plugin.register === 'function') {
+          plugin.register(api);
+        } else if (typeof plugin.activate === 'function') {
+          // Legacy fallback for old-format plugins
+          plugin.activate({
+            onAgentStart: (handler) => api.registerHook('agent:start', handler),
+            onAgentComplete: (handler) => api.registerHook('agent:complete', handler),
+            onToolCall: (handler) => api.registerHook('tool:call', handler),
+            onToolResult: (handler) => api.registerHook('tool:result', handler),
+            onMessage: (handler) => api.registerHook('message', handler),
+            registerTool: (tool) => api.registerTool(tool),
+            log: api.log,
+          });
+        }
+        api.log.info(`Bridged OpenClaw plugin: ${plugin.name} (${file})`);
       } catch (err) {
-        ctx.log.error(`Failed to bridge ${file}: ${err.message}`);
+        api.log.error(`Failed to bridge ${file}: ${err.message}`);
       }
     }
   },
-  deactivate() {},
 };

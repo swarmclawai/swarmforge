@@ -69,15 +69,15 @@ module.exports = {
   ],
 
   // --- OpenClaw Format ---
-  activate(ctx) {
-    ctx.onAgentStart((agentCtx) => {
+  register(api) {
+    api.registerHook('agent:start', (agentCtx) => {
       const messages = agentCtx.session?.messages || [];
       const tokens = estimateContextTokens(messages);
       if (tokens > WARNING_THRESHOLD) {
-        ctx.log.warn(`Context size: ~${tokens} tokens (${tokens > CRITICAL_THRESHOLD ? 'CRITICAL' : 'WARNING'})`);
+        api.log.warn(`Context size: ~${tokens} tokens (${tokens > CRITICAL_THRESHOLD ? 'CRITICAL' : 'WARNING'})`);
       }
     });
-    ctx.registerTool({
+    api.registerTool({
       name: 'check_context_size',
       description: 'Check conversation context token count.',
       parameters: { type: 'object', properties: {} },
@@ -85,7 +85,6 @@ module.exports = {
         return JSON.stringify({ message: 'Use within a session for accurate context measurement' });
       },
     });
-    ctx.log.info('Context Window monitor activated');
+    api.log.info('Context Window monitor activated');
   },
-  deactivate() {},
 };
